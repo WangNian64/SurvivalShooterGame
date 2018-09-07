@@ -7,7 +7,7 @@ public class PlayerMovement : MonoBehaviour {
     Vector3 movement;//玩家位移
     int floorMask;//floor图层
     Animator anim;//绑定动画组件
-    float camRayLength;//相机射线长度
+    float camRayLength = 100f;//相机射线长度
     Rigidbody playerRigidbody;//玩家刚体属性
     private void Awake()
     {
@@ -26,15 +26,16 @@ public class PlayerMovement : MonoBehaviour {
         float v = Input.GetAxisRaw("Vertical");
         PlayerMove(h, v);//运动
         PlayerTurning();//转向
-
-	}
-
+        Animating(h, v);  //根据状态播放动画
+    }
+    //玩家运动
     private void PlayerMove(float h, float v)
     {
         movement.Set(h, 0f, v);//设置玩家运动向量
         movement = movement.normalized * speed * Time.deltaTime;//设置每帧的位移
         playerRigidbody.MovePosition(transform.position + movement);
     }
+    //实现鼠标点击地面玩家转向
     private void PlayerTurning()
     {
         Ray camRay = Camera.main.ScreenPointToRay(Input.mousePosition);//从鼠标位置发出与摄像机射线平行的射线。
@@ -47,5 +48,11 @@ public class PlayerMovement : MonoBehaviour {
             Quaternion newRotation = Quaternion.LookRotation(playerToMouse);
             playerRigidbody.MoveRotation(newRotation);
         }
+    }
+    private void Animating(float h, float v)
+    {
+        //判断玩家是否走动设置bool，从而触发walk动画
+        bool isWalking = h != 0f || v != 0f;
+        anim.SetBool("IsWalking", isWalking);
     }
 }
